@@ -8,45 +8,60 @@ Our Research Project for CSE 40932: Exotic Computing is a Reversible PDA Validat
 
 ---
 
-## Usage
+### Usage
 
 Our program, written in Python, operates on the following input:
 
 ```sh
-$ python3 rePDAsim.py machine.pda 0101 f
-#                     [1]         [2]  [3]
+$ python3 rePDAsim.py machine.pda [0101] [f]
+#                     [1]          [2]   [3]
 ```
 
-1. machine specification file, contains the transition information:
+#### 1. machine specification file, contains the transition information.
+
+This file is formatted as a `csv` file:
 
 ```csv
-fromState, direction, inputChar, stackChar, toState, stackChange
-q0,f,0,1,q1,ep
+direction,fromState,inputChar,stackChar,toState,stackChange
+f,q0,ep,ep,q1,$
+f,q1,(,ep,q1,(
+f,q1,),(,q2,ep
+f,q2,),(,q2,ep
+f,q2,ep,$,q3,ep
+f,q1,),ep,qerr,ep
+f,q1,ep,$,qerr,ep
+f,q2,(,ep,qerr,ep
+f,q2,ep,$,qerr,ep
 ```
 
-> [!WARNING]
-> make an actual example
+> [!NOTE]
+> The `ep` symbol is used to represent the empty string. `ep` represents the same as $\epsilon$ in a formal description of a PDA.
+> Essentially, it is used in inputs to represent the absence of a character or stack symbol. As a stackChange symbol, it represents a no-op.
 
-<!-- this should render nicely but idk if it will (thanks internet) -->
+> [!NOTE]
+> while the simulator is designed to simulate a reversible PDA, the input machine does _not_ have to be reversible.
+> The simulator _can_ still simulate it (in the forward direction) and the reversibility check _will_ fail.
 
-2. input string
+> [!NOTE]
+> spaces (unless the character being specified is a space) will break things
 
-   the string on which the PDA operates.
+<!-- these should render nicely but idk if it will (thanks internet) -->
 
-3. Direction:
+#### 2. optional: input string
 
-   the direction either will be specified as `f` or `b`.
+the string on which the PDA operates.
 
-> [!WARNING]
-> Need to figure out some plan for interactivity.
+#### 3. optional: direction:
+
+the direction either will be specified as `f` or `b`.
 
 ---
 
-## Automaton Description
+## Formal Automaton Description
 
 For our project, a "Bidirectional Pushdown Automata" (BPDA) is defined as an extension of the reversible DFA (BFA) to include a stack. It includes the following properties:
 
-1. **Control Input**: The BPDA, like the BFA, has a second "control" input from the alphabet $\beta = \{f, b\}$, where $f$ stands for "forwards" and $b$ for "backwards". This control input determines the direction of tape head movement and affects the transitions.
+1. **Control Input**: The BPDA, like the BFA, has a second "control" input from the alphabet $\beta = {f, b}$, where $f$ stands for "forwards" and $b$ for "backwards". This control input determines the direction of tape head movement and affects the transitions.
 
 2. **Tape Operations**:
 
@@ -65,7 +80,7 @@ For our project, a "Bidirectional Pushdown Automata" (BPDA) is defined as an ext
      - $Q$ is the set of states.
      - $\Sigma$ is the tape alphabet.
      - $\Gamma$ is the stack alphabet.
-     - $\beta = \{f, b\}$ is the control alphabet.
+     - $\beta = {f, b}$ is the control alphabet.
      - $\Gamma^*$ represents the stack symbol resulting from the transition.
 
 5. **Reversibility**:

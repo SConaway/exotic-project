@@ -8,9 +8,9 @@ def parse_transitions(file_contents: str):
         dict: The parsed transitions ("direction" > "fromState,inputChar,stackChar" > "toState,stackChange)"
 
     >>> parse_transitions('''fromState,direction,inputChar,stackChar,toState,stackChange
-    ... q0,f,0,1,q1,ep
-    ... q0,f,1,1,q1,ep
-    ... q1,f,0,1,qacc,ep
+    ... f,q0,0,1,q1,ep
+    ... f,q0,1,1,q1,ep
+    ... f,q1,0,1,qacc,ep
     ... ''')
     {'f': {'q0,0,1': 'q1,ep', 'q0,1,1': 'q1,ep', 'q1,0,1': 'qacc,ep'}}
     """

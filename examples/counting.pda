@@ -1,0 +1,10 @@
+direction,fromState,inputChar,stackChar,toState,stackChange
+f,q0,ep,ep,q1,$
+f,q1,(,ep,q1,(
+f,q1,),(,q2,ep
+f,q2,),(,q2,ep
+f,q2,ep,$,q3,ep
+f,q1,),ep,qerr,ep
+f,q1,ep,$,qerr,ep
+f,q2,(,ep,qerr,ep
+f,q2,ep,$,qerr,ep
