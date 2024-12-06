@@ -1,5 +1,14 @@
+import utils
+
+
 class PDA:
-    def __init__(self, transitions, initial_state, final_states, reject_states):
+    def __init__(
+        self,
+        transitions: dict[str, dict[str, str]],
+        initial_state: str,
+        final_states: list[str],
+        reject_states: list[str],
+    ):
         """
         Initialize the PDA with transitions, initial state, final, and reject states.
         """
@@ -14,8 +23,7 @@ class PDA:
         Verify if the PDA is reversible.
         Returns True if reversible, False otherwise.
         """
-        # TODO: this
-        pass
+        return utils.validate_transitions(self.transitions)
 
     def simulate(self, input_string, direction):
         """

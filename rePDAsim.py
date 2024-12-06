@@ -38,7 +38,9 @@ def main():
     direction = sys.argv[3] or None
 
     # Load transitions
-    transitions = parse_transitions(machine_file)
+    with open(machine_file) as f:
+        transitions_str = f.read()
+    transitions = parse_transitions(transitions_str)
     initial_state = "q0"
     final_states = ["q_accept", "qacc"]
     reject_states = ["q_reject", "qrej"]
