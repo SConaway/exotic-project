@@ -1,7 +1,14 @@
+#! /usr/bin/env python3
+
 import sys
 
 from pda import PDA
 from utils import parse_transitions
+
+
+def usage(status=0):
+    print("Usage: python3 rePDAsim.py <machine.pda> [input string] [direction (f|b)]")
+    sys.exit(status)
 
 
 def interactive_simulation(pda):
@@ -12,7 +19,10 @@ def interactive_simulation(pda):
     print("Enter characters and direction {'f' or 'b'} (e.g., '0f', '1b').")
     print("Type 'exit' to quit.")
     while True:
-        user_input = input("Input: ").strip()
+        try:
+            user_input = input("Input: ").strip()
+        except EOFError:
+            break
         if user_input == "exit":
             break
         if len(user_input) == 2 and user_input[1] in ["f", "b"]:
@@ -27,15 +37,15 @@ def interactive_simulation(pda):
 
 def main():
     # Parse command-line arguments
-    if len(sys.argv) < 4:
-        print(
-            "Usage: python3 rePDAsim.py <machine.pda> <input string> <direction (f|b)>"
-        )
-        return
+    if "-h" in sys.argv or "--help" in sys.argv:
+        usage(0)
+    elif not (len(sys.argv) == 2 or len(sys.argv) == 4):
+        usage(1)
+    elif len(sys.argv) == 3:
+        print("Input string specified but no direction.")
+        usage(1)
 
     machine_file = sys.argv[1]
-    input_string = sys.argv[2]
-    direction = sys.argv[3] or None
 
     # Load transitions
     with open(machine_file) as f:
@@ -54,9 +64,11 @@ def main():
         print("The machine is not reversible.")
 
     # Simulate or check reversibility
-    if input_string == "interactive" or direction == "interactive":
+    if len(sys.argv) == 2:
         interactive_simulation(pda)
-    else:
+    if len(sys.argv) == 4:
+        input_string = sys.argv[2]
+        direction = sys.argv[3]
         print("Simulation result:", pda.simulate(input_string, direction))
 
 
