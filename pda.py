@@ -27,20 +27,27 @@ class PDA:
 
     def simulate(self, input_string, direction):
         """
-        Simulate the PDA for a given input string and direction ('f' or 'b'). 
+        Simulate the PDA for a given input string and direction ('f' or 'b').
         Returns the final state, stack content, and True if the simulation ends in an accept state and False if not.
         """
 
         for item in input_string:
             proceed = self.step(item, direction)
-            if !proceed: return self.current_state, self.stack, False #if a transition fails, result of PDA is false
+            if not proceed:
+                return (
+                    self.current_state,
+                    self.stack,
+                    False,
+                )  # if a transition fails, result of PDA is false
 
         # Check if the current_state is accept following the entire input string
-        if self.current_state in self.final_states: result = True
-        else: result = False
+        if self.current_state in self.final_states:
+            result = True
+        else:
+            result = False
 
         return self.current_state, self.stack, result
-    
+
     def step(self, char, direction):
         """
         Perform a single transition based on the current state, input character,
