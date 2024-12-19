@@ -65,7 +65,6 @@ Run the simulator with an input string and direction:
 
 ```sh
 $ python3 rePDAsim.py examples/counting.pda "(()())" f
-Missing reverse transition for forward transition: 'q0' => 'q1' on input '' with stack ''.
 current_state: q0, char: (, direction: f, stack: []
 current_state: q1, char: (, direction: f, stack: ['$']
 current_state: q1, char: (, direction: f, stack: ['$', '(']
@@ -78,6 +77,19 @@ Simulation results:
 	Final state: qacc
 	Stack content: []
 	Accept state reached: True
+$ python3 rePDAsim.py examples/counting.pda "(()())" b
+current_state: qacc, char: ), direction: b, stack: []
+current_state: q1, char: ), direction: b, stack: ['$']
+current_state: q1, char: ), direction: b, stack: ['$', '(']
+current_state: q1, char: (, direction: b, stack: ['$', '(', '(']
+current_state: q1, char: ), direction: b, stack: ['$', '(']
+current_state: q1, char: (, direction: b, stack: ['$', '(', '(']
+current_state: q1, char: (, direction: b, stack: ['$', '(']
+current_state: q1, char: , direction: b, stack: ['$']
+Simulation results:
+	Final state: q0
+	Stack content: []
+	Accept state reached: True
 ```
 
 #### Interactive Mode
@@ -86,7 +98,6 @@ Run the validator without simulating:
 
 ```
 $ python3 rePDAsim.py examples/counting.pda
-Missing reverse transition for forward transition: 'q0' => 'q1' on input '' with stack ''.
 Enter characters and direction {'f' or 'b'} (e.g., '0f', '1b').
 Type 'exit' to quit.
 Input: (f

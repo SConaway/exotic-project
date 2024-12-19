@@ -100,6 +100,11 @@ def main():
     if len(sys.argv) == 4:
         input_string = sys.argv[2]
         direction = sys.argv[3]
+        if direction == "b":
+            input_string = input_string[::-1]
+            pda.current_state = "qacc"
+            pda.final_states = set(["q0"])
+
         res = pda.simulate(input_string, direction)
         print("Simulation results:")
 

@@ -238,7 +238,7 @@ def validate(transitions, initial_state, final_states, reject_states):
             if not reverse_found:
                 raise ValueError(
                     f"Missing reverse transition for forward transition: "
-                    f"'{forward_state}' => '{to_state}' on input '{input_char}' with stack '{stack_char}'."
+                    f"'{forward_state}' => '{to_state}' on input '{input_char}' with forward stack change '{stack_char}'."
                 )
 
     return True
