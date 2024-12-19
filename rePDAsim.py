@@ -25,14 +25,46 @@ def interactive_simulation(pda):
             break
         if user_input == "exit":
             break
-        if len(user_input) == 2 and user_input[1] in ["f", "b"]:
+        # no input
+        if len(user_input) == 0:
+            print("assuming no input character, forward")
+            direction = "f"
+            if pda.step("", direction):
+                print(
+                    f"State: {pda.current_state}, Stack: {pda.stack}{', input not consumed' if pda.last_consumed_char != '' else ''}"
+                )
+            else:
+                print("Invalid transition.")
+
+        # one character input means only direction
+        elif len(user_input) == 1 and user_input in ["f", "b"]:
+            print("assuming no input character")
+            direction = user_input
+            if pda.step("", direction):
+                print(
+                    f"State: {pda.current_state}, Stack: {pda.stack}{', input not consumed' if pda.last_consumed_char != '' else ''}"
+                )
+            else:
+                print("Invalid transition.")
+
+        # two characters input means input character and direction
+        elif len(user_input) == 2 and user_input[1] in ["f", "b"]:
             char, direction = user_input
             if pda.step(char, direction):
-                print(f"State: {pda.current_state}, Stack: {pda.stack}")
+                print(
+                    f"State: {pda.current_state}, Stack: {pda.stack}{', input not consumed' if pda.last_consumed_char != char else ''}"
+                )
             else:
                 print("Invalid transition.")
         else:
             print("Invalid input. Format: <char><f|b> (e.g., '0f', '1b')")
+
+        if pda.current_state in pda.final_states:
+            print("Accept state reached.")
+            break
+        if pda.current_state in pda.reject_states:
+            print("Reject state reached.")
+            break
 
 
 def main():

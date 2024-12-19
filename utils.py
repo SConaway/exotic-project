@@ -4,38 +4,60 @@ import csv
 def parse_transitions(file_contents: str):
     """
     Parse the PDA transition file into a nested dictionary.
-    Returns:
-        dict: The parsed transitions ("direction" > "fromState,inputChar,stackChar" > "toState,stackChange)"
 
-    >>> parse_transitions('''fromState,direction,inputChar,stackChar,toState,stackChange
+    Returns:
+        dict: The parsed transitions ("direction" > "state" > ("inputChar", "stackChar") > ("toState", "stackChange"))
+
+    >>> parse_transitions('''direction,fromState,inputChar,stackChar,toState,stackChange
     ... f,q0,0,1,q1,ep
     ... f,q0,1,1,q1,ep
     ... f,q1,0,1,qacc,ep
     ... ''')
-    {'f': {'q0,0,1': 'q1,ep', 'q0,1,1': 'q1,ep', 'q1,0,1': 'qacc,ep'}}
+    {'f': {'q0': {('0', '1'): ('q1', ''), ('1', '1'): ('q1', '')}, 'q1': {('0', '1'): ('qacc', '')}}, 'b': {}}
     """
-    # initialize the transitions dictionary
-    transitions: dict[str, dict[str, str]] = {}
+    # Initialize the transitions dictionary
+    transitions: dict[str, dict[str, dict[tuple[str, str], tuple[str, str]]]] = {
+        "f": {},
+        "b": {},
+    }
 
-    # open the file
-    reader = csv.DictReader(file_contents.splitlines())
+    # Read the CSV contents
+    reader = csv.DictReader(file_contents.strip().splitlines())
     for row in reader:
-        if row == {}:
-            continue
-        fromState = row["fromState"]
-        direction = row["direction"]
-        inputChar = row["inputChar"]
-        stackChar = row["stackChar"]
-        toState = row["toState"]
-        stackChange = row["stackChange"]
+        # Extract and validate the values
+        from_state = row.get("fromState", "").strip()
+        direction = row.get("direction", "").strip()
+        input_char = row.get("inputChar", "").strip()
+        stack_char = row.get("stackChar", "").strip()
+        to_state = row.get("toState", "").strip()
+        stack_change = row.get("stackChange", "").strip()
 
-        key = f"{fromState},{inputChar},{stackChar}"
-        value = f"{toState},{stackChange}"
+        if not from_state or not to_state:
+            raise ValueError(
+                f"Invalid states: fromState='{from_state}', toState='{to_state}'"
+            )
+        if direction not in {"f", "b"}:
+            raise ValueError(f"Invalid direction: {direction}")
+        if input_char != "ep" and len(input_char) != 1:
+            raise ValueError(f"Invalid inputChar: {input_char}")
+        if stack_char != "ep" and len(stack_char) != 1:
+            raise ValueError(f"Invalid stackChar: {stack_char}")
+        if stack_change != "ep" and len(stack_change) != 1:
+            raise ValueError(f"Invalid stackChange: {stack_change}")
 
-        if direction not in transitions:
-            transitions[direction] = {}
+        # Normalize epsilon values
+        input_char = input_char if input_char != "ep" else ""
+        stack_char = stack_char if stack_char != "ep" else ""
+        stack_change = stack_change if stack_change != "ep" else ""
 
-        transitions[direction][key] = value
+        # Create the key and value for the transition
+        key = (input_char, stack_char)
+        value = (to_state, stack_change)
+
+        # Add the transition, grouping by state
+        if from_state not in transitions[direction]:
+            transitions[direction][from_state] = {}
+        transitions[direction][from_state][key] = value
 
     return transitions
 
