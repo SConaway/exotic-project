@@ -7,7 +7,7 @@ from utils import parse_transitions
 
 
 def usage(status=0):
-    print("Usage: python3 rePDAsim.py <machine.pda> [input string] [direction (f|b)]")
+    print("Usage: python3 rePDAsim.py <machine.pda> [input string direction (f|b)]")
     sys.exit(status)
 
 
@@ -92,8 +92,7 @@ def main():
 
     if pda.is_reversible():
         print("The machine is reversible.")
-    else:
-        print("The machine is not reversible.")
+    # no else needed as the function will print the reason if it is not reversible
 
     # Simulate or check reversibility
     if len(sys.argv) == 2:
@@ -101,7 +100,12 @@ def main():
     if len(sys.argv) == 4:
         input_string = sys.argv[2]
         direction = sys.argv[3]
-        print("Simulation result:", pda.simulate(input_string, direction))
+        res = pda.simulate(input_string, direction)
+        print("Simulation results:")
+
+        print(f"\tFinal state: {res[0]}")
+        print(f"\tStack content: {res[1]}")
+        print(f"\tAccept state reached: {res[2]}")
 
 
 if __name__ == "__main__":

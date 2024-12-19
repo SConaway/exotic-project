@@ -24,7 +24,16 @@ class PDA:
         Verify if the PDA is reversible.
         Returns True if reversible, False otherwise.
         """
-        return utils.validate_transitions(self.transitions)
+        try:
+            utils.validate(
+                self.transitions,
+                self.current_state,
+                self.final_states,
+                self.reject_states,
+            )
+        except ValueError as e:
+            print(e)
+            return False
 
     def _has_epsilon_transitions(self, direction):
         """
@@ -173,9 +182,9 @@ class PDA:
         >>> pda.stack
         []
         """
-        # print(
-        #     f"char: {char}, direction: {direction}, current_state: {self.current_state}, stack: {self.stack}"
-        # )
+        print(
+            f"current_state: {self.current_state}, char: {char}, direction: {direction}, stack: {self.stack}"
+        )
         if direction not in self.transitions:
             return False
 
