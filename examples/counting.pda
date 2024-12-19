@@ -3,4 +3,8 @@ f,q0,ep,ep,q1,$
 f,q1,(,ep,q1,(
 f,q1,),(,q1,ep
 f,q1,ep,$,qacc,ep
+b,q1,ep,$,q0,ep
+b,q1,(,(,q1,ep
+b,q1,),ep,q1,(
+b,qacc,ep,ep,q1,$
 

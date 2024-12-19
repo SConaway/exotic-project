@@ -2,95 +2,153 @@
 
 ## Reversible PDA Validator and Simulator
 
-By Steven Conaway and Anna Teerlinck
+**By Steven Conaway and Anna Teerlinck**
 
-Our Research Project for CSE 40932: Exotic Computing is a Reversible PDA Validator and Simulator.
+This project is a Reversible PDA Validator and Simulator developed as part of **CSE 40932: Exotic Computing**.
 
 ---
 
-### Usage
+## Table of Contents
 
-Our program, written in Python, operates on the following input:
+1. [Introduction](#introduction)
+2. [Usage](#usage)
+   - [Input File](#input-file)
+   - [Input String](#input-string)
+   - [Direction](#direction)
+3. [Formal Automaton Description](#formal-automaton-description)
+4. [Examples](#examples)
+
+---
+
+## Introduction
+
+This project explores a Reversible Pushdown Automaton (R-PDA), a computational model combining a stack-based automaton with reversibility. The validator checks for machine reversibility, while the simulator executes both forward and backward simulations of a PDA.
+
+---
+
+## Usage
+
+Run the program using:
 
 ```sh
-$ python3 rePDAsim.py machine.pda [0101] [f]
-#                     [1]          [2]   [3]
+$ python3 rePDAsim.py machine.pda [input_string direction (f|b)]
 ```
 
-#### 1. machine specification file, contains the transition information.
+### Parameters
 
-This file is formatted as a `csv` file:
+1. **`machine.pda`** (required): A file containing the PDA transitions in CSV format.
 
-```csv
-direction,fromState,inputChar,stackChar,toState,stackChange
-f,q0,ep,ep,q1,$
-f,q1,(,ep,q1,(
-f,q1,),(,q2,ep
-f,q2,),(,q2,ep
-f,q2,ep,$,q3,ep
-f,q1,),ep,qerr,ep
-f,q1,ep,$,qerr,ep
-f,q2,(,ep,qerr,ep
-f,q2,ep,$,qerr,ep
+   - Example:
+     ```csv
+     direction,fromState,inputChar,stackChar,toState,stackChange
+     f,q0,ep,ep,q1,$
+     f,q1,(,ep,q1,(
+     f,q1,),(,q1,ep
+     f,q1,ep,$,qacc,ep
+     ```
+     - `ep` represents an empty string ($\epsilon$ in formal notation).
+
+2. **`input_string`** (optional): The string for the PDA to process.
+
+   - If omitted, the program will run in interactive mode
+
+3. **`direction`** (optional): Specifies the simulation direction.
+   - `f` for forward, `b` for backward.
+
+---
+
+### Examples
+
+#### Automated Mode
+
+Run the simulator with an input string and direction:
+
+```sh
+$ python3 rePDAsim.py examples/counting.pda "(()())" f
+Missing reverse transition for forward transition: 'q0' => 'q1' on input '' with stack ''.
+current_state: q0, char: (, direction: f, stack: []
+current_state: q1, char: (, direction: f, stack: ['$']
+current_state: q1, char: (, direction: f, stack: ['$', '(']
+current_state: q1, char: ), direction: f, stack: ['$', '(', '(']
+current_state: q1, char: (, direction: f, stack: ['$', '(']
+current_state: q1, char: ), direction: f, stack: ['$', '(', '(']
+current_state: q1, char: ), direction: f, stack: ['$', '(']
+current_state: q1, char: , direction: f, stack: ['$']
+Simulation results:
+	Final state: qacc
+	Stack content: []
+	Accept state reached: True
 ```
 
-> [!NOTE]
-> The `ep` symbol is used to represent the empty string. `ep` represents the same as $\epsilon$ in a formal description of a PDA.
-> Essentially, it is used in inputs to represent the absence of a character or stack symbol. As a stackChange symbol, it represents a no-op.
+#### Interactive Mode
 
-> [!NOTE]
-> while the simulator is designed to simulate a reversible PDA, the input machine does _not_ have to be reversible.
-> The simulator _can_ still simulate it (in the forward direction) and the reversibility check _will_ fail.
+Run the validator without simulating:
 
-> [!NOTE]
-> spaces (unless the character being specified is a space) will break things
-
-<!-- these should render nicely but idk if it will (thanks internet) -->
-
-#### 2. optional: input string
-
-the string on which the PDA operates.
-
-#### 3. optional: direction:
-
-the direction either will be specified as `f` or `b`.
+```
+$ python3 rePDAsim.py examples/counting.pda
+Missing reverse transition for forward transition: 'q0' => 'q1' on input '' with stack ''.
+Enter characters and direction {'f' or 'b'} (e.g., '0f', '1b').
+Type 'exit' to quit.
+Input: (f
+current_state: q0, char: (, direction: f, stack: []
+State: q1, Stack: ['$'], input not consumed
+Input: (f
+current_state: q1, char: (, direction: f, stack: ['$']
+State: q1, Stack: ['$', '(']
+Input: (f
+current_state: q1, char: (, direction: f, stack: ['$', '(']
+State: q1, Stack: ['$', '(', '(']
+Input: )f
+current_state: q1, char: ), direction: f, stack: ['$', '(', '(']
+State: q1, Stack: ['$', '(']
+Input: (f
+current_state: q1, char: (, direction: f, stack: ['$', '(']
+State: q1, Stack: ['$', '(', '(']
+Input: )f
+current_state: q1, char: ), direction: f, stack: ['$', '(', '(']
+State: q1, Stack: ['$', '(']
+Input: )f
+current_state: q1, char: ), direction: f, stack: ['$', '(']
+State: q1, Stack: ['$']
+Input:
+assuming no input character, forward
+current_state: q1, char: , direction: f, stack: ['$']
+State: qacc, Stack: []
+Accept state reached.
+```
 
 ---
 
 ## Formal Automaton Description
 
-For our project, a "Bidirectional Pushdown Automata" (BPDA) is defined as an extension of the reversible DFA (BFA) to include a stack. It includes the following properties:
+A Bidirectional Pushdown Automaton (BPDA) extends a PDA to support reversible computations. Key features include:
 
-1. **Control Input**: The BPDA, like the BFA, has a second "control" input from the alphabet $\beta = {f, b}$, where $f$ stands for "forwards" and $b$ for "backwards". This control input determines the direction of tape head movement and affects the transitions.
+1. **Control Input**:
 
-2. **Tape Operations**:
+   - Control symbols $f$ and $b$ specify forward and backward directions, respectively.
 
-   - When the control input is $f$ (forward), the BPDA reads the current character under the tape head, processes the state and stack, and moves the tape head one position to the right.
-   - When the control input is $b$ (backward), the BPDA first moves the tape head one position to the left, reads the tape, processes the state and stack, and leaves the tape head in place after updating the state.
+2. **Stack Operations**:
 
-3. **Stack Operations**:
+   - Operations include push, pop, and no-op, defined for each transition.
 
-   - Like a traditional PDA, the BPDA maintains a stack on which it can perform push, pop, and no-op operations.
-   - Transitions are determined by the current state, the current character on the tape, the stack's top symbol, and the control input (direction).
+3. **Transition Function**:
 
-4. **Transition Function**:
+   - $\delta: Q \times \Sigma \times \Gamma \times \beta \to Q \times \Gamma^*$
+   - Example:
+     - Forward: $\delta(q_0, a, Z, f) = (q_1, \gamma)$
+     - Reverse: $\delta^{-1}(q_1, a, \gamma, b) = (q_0, Z)$
 
-   - The transition function $\delta$ is defined as: $\delta: Q \times \Sigma \times \Gamma \times \beta \to Q \times \Gamma^*$
-     Here:
-     - $Q$ is the set of states.
-     - $\Sigma$ is the tape alphabet.
-     - $\Gamma$ is the stack alphabet.
-     - $\beta = {f, b}$ is the control alphabet.
-     - $\Gamma^*$ represents the stack symbol resulting from the transition.
+4. **Reversibility**:
+   - For every forward transition, there exists an inverse transition. Specifically, for every $\delta(q, a, Z, c) = (q', \gamma, d)$ (where $q$ is the current state, $a$ the tape character, $Z$ the stack's top, $c$ the control input, and $\gamma$ the new stack string), there exists a corresponding transition $\delta^{-1}(q', a', \gamma', c') = (q, Z, d')$ such that the automaton can backtrack.
 
-5. **Reversibility**:
+---
 
-   - The BPDA must be reversible, meaning every transition has a unique inverse. Specifically:
-     - For every $\delta(q, a, Z, c) = (q', \gamma, d)$ (where $q$ is the current state, $a$ the tape character, $Z$ the stack's top, $c$ the control input, and $\gamma$ the new stack string), there exists a corresponding transition $\delta^{-1}(q', a', \gamma', c') = (q, Z, d')$ such that the automaton can backtrack.
+## Notes
 
-6. **Acceptance**:
-
-   - The BPDA accepts an input string if it reaches a designated accepting state.
-
-7. **State Diagrams**:
-   - State transitions are labeled with triplets of the form $x:a, Z \to \gamma$, where $x$ is the control direction, $a$ is the tape character, $Z$ is the current stack's top symbol, and $\gamma$ is the resulting stack string after the transition.
+- The `ep` symbol:
+  - Represents "no character" (input character or top of stack) or "no stack change."
+  - Used for empty string transitions and no-op stack changes.
+- **Non-reversible simulation**:
+  - Machines do not need to be reversible to simulate them. However, the reversibility check will fail for such machines.
+- **Limitations**:
+  - A stack or input character which is a space character will be treated as an empty string.
