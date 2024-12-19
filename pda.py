@@ -29,6 +29,28 @@ class PDA:
     def _has_epsilon_transitions(self, direction):
         """
         Check if there are epsilon transitions available for the current state.
+
+        >>> transitions = {
+        ...     "f": {
+        ...         "q0": {("", ""): ("q1", "1")},
+        ...         "q1": {("1", "1"): ("q2", "")},
+        ...     },
+        ...     "b": {}
+        ... }
+        >>> pda = PDA(transitions, initial_state="q0", final_states=["q2"], reject_states=[])
+        >>> pda._has_epsilon_transitions("f")
+        True
+
+        >>> transitions = {
+        ...     "f": {
+        ...         "q0": {("0", ""): ("q1", "1")},
+        ...         "q1": {("1", "1"): ("q2", "")},
+        ...     },
+        ...     "b": {}
+        ... }
+        >>> pda = PDA(transitions, initial_state="q0", final_states=["q2"], reject_states=[])
+        >>> pda._has_epsilon_transitions("f")
+        False
         """
         if direction not in self.transitions:
             return False
@@ -44,6 +66,39 @@ class PDA:
         """
         Simulate the PDA for a given input string and direction ('f' or 'b').
         Returns the final state, stack content, and True if the simulation ends in an accept state and False if not.
+
+        >>> transitions = {
+        ...     "f": {
+        ...         "q0": {("0", ""): ("q1", "1")},
+        ...         "q1": {("1", "1"): ("q2", "")},
+        ...     },
+        ...     "b": {}
+        ... }
+        >>> pda = PDA(transitions, initial_state="q0", final_states=["q2"], reject_states=[])
+        >>> pda.simulate("01", "f")
+        ('q2', [], True)
+
+        >>> transitions = {
+        ...     "f": {
+        ...         "q0": {("", ""): ("q1", "1")},
+        ...         "q1": {("1", "1"): ("q2", "")},
+        ...     },
+        ...     "b": {}
+        ... }
+        >>> pda = PDA(transitions, initial_state="q0", final_states=["q2"], reject_states=[])
+        >>> pda.simulate("1", "f")
+        ('q2', [], True)
+
+        >>> transitions = {
+        ...     "f": {
+        ...         "q0": {("", ""): ("q1", "1")},
+        ...         "q1": {("0", "1"): ("q2", "")},
+        ...     },
+        ...     "b": {}
+        ... }
+        >>> pda = PDA(transitions, initial_state="q0", final_states=["q2"], reject_states=[])
+        >>> pda.simulate("1", "f")
+        ('q1', ['1'], False)
         """
         input_index = 0
 
@@ -71,6 +126,52 @@ class PDA:
         Perform a single transition based on the current state, input character,
         and direction ('f' or 'b').
         Returns True if the step is successful, False otherwise.
+
+        >>> transitions = {
+        ...     "f": {
+        ...         "q0": {("0", ""): ("q1", "1")},
+        ...         "q1": {("1", "1"): ("q2", "")},
+        ...     },
+        ...     "b": {}
+        ... }
+        >>> pda = PDA(transitions, initial_state="q0", final_states=["q2"], reject_states=[])
+        >>> pda.step("0", "f")
+        True
+        >>> pda.current_state
+        'q1'
+        >>> pda.stack
+        ['1']
+
+        >>> transitions = {
+        ...     "f": {
+        ...         "q0": {("0", ""): ("q1", "1")},
+        ...         "q1": {("1", "1"): ("q2", "")},
+        ...     },
+        ...     "b": {}
+        ... }
+        >>> pda = PDA(transitions, initial_state="q1", final_states=["q2"], reject_states=[])
+        >>> pda.stack = ["1"]
+        >>> pda.step("1", "f")
+        True
+        >>> pda.current_state
+        'q2'
+        >>> pda.stack
+        []
+
+        >>> transitions = {
+        ...     "f": {
+        ...         "q0": {("0", ""): ("q1", "1")},
+        ...         "q1": {("1", "1"): ("q2", "")},
+        ...     },
+        ...     "b": {}
+        ... }
+        >>> pda = PDA(transitions, initial_state="q0", final_states=["q2"], reject_states=[])
+        >>> pda.step("1", "f")
+        False
+        >>> pda.current_state
+        'q0'
+        >>> pda.stack
+        []
         """
         # print(
         #     f"char: {char}, direction: {direction}, current_state: {self.current_state}, stack: {self.stack}"
